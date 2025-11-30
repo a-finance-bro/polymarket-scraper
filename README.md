@@ -10,13 +10,24 @@ A comprehensive toolset to scrape Polymarket data and analyze it for arbitrage o
 -   **Smart Organization**: Categorizes markets by label (e.g., `Politics.json`, `Crypto.json`) in timestamped directories.
 
 ### Arbitrage Finder
--   **Hybrid Detection System**:
-    -   **Algorithmic Engine**: Deterministically checks for Negative Risk (Sum of Ask Prices < 1.0) and other mathematical arbitrages (inspired by Jeremy Whittaker's strategy).
-    -   **AI-Powered Analysis**: Uses **GPT-4o** (with GPT-4.1 fallback) to find complex Cross-Market and Value arbitrages.
--   **Three Detection Modes**:
-    -   **Real Arbitrage**: Sure profit opportunities (Algo & LLM).
-    -   **Cross-Market Arbitrage**: Hedging across correlated markets (e.g. State vs National).
-    -   **Value Arbitrage**: Mispricing vs reality.
+-   **Hybrid Detection System**: Combines deterministic algorithmic checks with AI-powered semantic analysis.
+-   **Supported Arbitrage Strategies**:
+    1.  **Negative Risk (Real Arbitrage)**:
+        -   **Event Level**: When the sum of "Yes" prices for all mutually exclusive candidates in an event is < 1.0. (e.g., Sum of all 2024 Election candidates = 0.98).
+        -   **Market Level**: When "Yes" + "No" prices for a single market sum to < 1.0.
+    2.  **Spread / Interval Arbitrage**:
+        -   Exploits logical inconsistencies in numerical thresholds.
+        -   *Example*: If "Bitcoin > $100k" costs 0.40 and "Bitcoin > $90k" costs 0.35, this is a logical impossibility (the superset must be >= subset).
+        -   *Strategy*: Buy "Yes" on the cheaper subset ($90k) and "No" on the expensive superset ($100k) for risk-free profit.
+    3.  **Mutually Exclusive "No" Arbitrage**:
+        -   Identifies markets that cannot both happen (e.g., "App #1" and "App #2").
+        -   *Strategy*: If Price(No #1) + Price(No #2) < 1.0, betting "No" on both guarantees a win (since only one can be #1).
+    4.  **Cross-Market Arbitrage (AI)**:
+        -   Identifies correlations between related markets.
+        -   *Example*: "Will Trump win PA?" vs "Will Trump win Election?".
+        -   *Strategy*: Hedge a specific outcome with a basket of related outcomes.
+    5.  **Value Arbitrage (AI)**:
+        -   Detects discrepancies between implied probabilities and real-world odds (based on polls, news, etc.).
 -   **Dark Mode UI**: Sleek, high-contrast interface for long monitoring sessions.
 -   **Scalable Architecture**:
     -   **Key Rotation & Validation**: Automatically manages and validates OpenAI keys.
