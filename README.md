@@ -43,7 +43,7 @@ Start the backend server:
 python3 server.py
 ```
 
-Then open **http://localhost:8000** in your browser.
+Then open **http://localhost:214** in your browser.
 -   Select your preferred model.
 -   Click **"Run Arbitrage Finder"**.
 -   Watch the progress bar as it scrapes and analyzes markets.
