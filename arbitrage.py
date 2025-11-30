@@ -137,7 +137,7 @@ class ArbitrageFinder:
             try:
                 client = OpenAI(api_key=key)
                 response = client.chat.completions.create(
-                    model="gpt-5.1-codex", # Using gpt-5.1-codex
+                                model="gpt-5-pro", # Using gpt-5-pro
                     messages=[{"role": "user", "content": prompt}],
                     response_format={"type": "json_object"}
                 )
