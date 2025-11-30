@@ -1,0 +1,9 @@
+data/
+screenshots/
+output/
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
+env/
+venv/
