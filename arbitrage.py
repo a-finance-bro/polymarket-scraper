@@ -20,15 +20,48 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 class KeyManager:
     def __init__(self, key_file):
         self.key_file = key_file
+        self.working_key_file = "working_keys.txt"
         self.keys = self._load_keys()
         self.current_index = 0
 
     def _load_keys(self):
+        # Prefer working keys if available and not empty
+        if os.path.exists(self.working_key_file) and os.path.getsize(self.working_key_file) > 0:
+            print(f"Loading keys from {self.working_key_file}")
+            with open(self.working_key_file, "r") as f:
+                keys = [line.strip() for line in f if line.strip()]
+                if keys: return keys
+
         if not os.path.exists(self.key_file):
             print(f"Warning: {self.key_file} not found.")
             return []
         with open(self.key_file, "r") as f:
             return [line.strip() for line in f if line.strip()]
+
+    def validate_keys(self):
+        print("Validating keys...")
+        all_keys = []
+        if os.path.exists(self.key_file):
+            with open(self.key_file, "r") as f:
+                all_keys = [line.strip() for line in f if line.strip()]
+        
+        working_keys = []
+        for key in all_keys:
+            try:
+                client = OpenAI(api_key=key)
+                client.models.list() # Simple check
+                working_keys.append(key)
+                print(f"Key ...{key[-4:]} is valid.")
+            except Exception as e:
+                print(f"Key ...{key[-4:]} is invalid: {e}")
+        
+        with open(self.working_key_file, "w") as f:
+            for key in working_keys:
+                f.write(f"{key}\n")
+        
+        self.keys = working_keys
+        print(f"Validation complete. Found {len(working_keys)} working keys.")
+        return len(working_keys)
 
     def get_current_key(self):
         if not self.keys:
@@ -39,8 +72,12 @@ class KeyManager:
         if not self.keys:
             return None
         self.current_index = (self.current_index + 1) % len(self.keys)
-        print(f"Rotated to key index {self.current_index}")
+        # print(f"Rotated to key index {self.current_index}")
         return self.keys[self.current_index]
+
+    def get_random_key(self):
+        if not self.keys: return None
+        return random.choice(self.keys)
 
     def get_all_keys(self):
         return self.keys
@@ -151,27 +188,47 @@ class ArbitrageFinder:
 
 
     async def _call_openai(self, prompt):
-        keys = self.openai_keys.get_all_keys()
-        
-        for _ in range(len(keys)):
-            key = self.openai_keys.get_current_key()
+        # Retry logic with key rotation and context fallback
+        max_retries = 5
+        for _ in range(max_retries):
+            key = self.openai_keys.get_random_key() # Use random key for concurrency
+            if not key: return None
+
             try:
                 client = OpenAI(api_key=key)
                 response = client.chat.completions.create(
-                                model="gpt-4o", # Using gpt-4o
+                    model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],
                     response_format={"type": "json_object"}
                 )
                 return response.choices[0].message.content
             except Exception as e:
-                print(f"OpenAI error with key ...{key[-4:]}: {e}")
-                self.openai_keys.rotate_key()
-                await asyncio.sleep(1)
-                
-        print("All OpenAI keys failed.")
+                error_str = str(e).lower()
+                if "429" in error_str: # Rate limit
+                    print(f"Rate limit with key ...{key[-4:]}, retrying...")
+                    await asyncio.sleep(1)
+                elif "400" in error_str or "context_length_exceeded" in error_str: # Context length
+                    print(f"Context length exceeded with gpt-4o, trying gpt-4.1...")
+                    try:
+                        response = client.chat.completions.create(
+                            model="gpt-4.1", # Fallback model
+                            messages=[{"role": "user", "content": prompt}],
+                            response_format={"type": "json_object"}
+                        )
+                        return response.choices[0].message.content
+                    except Exception as e2:
+                        print(f"Fallback failed: {e2}")
+                        return None # Give up on this file if fallback fails
+                else:
+                    print(f"OpenAI error with key ...{key[-4:]}: {e}")
+                    
+        print("Max retries exceeded for OpenAI call.")
         return None
 
     async def run(self):
+        # 0. Validate Keys
+        self.openai_keys.validate_keys()
+        
         # 1. Run Scraper
         data_dir = self.run_scraper()
         if not data_dir:
@@ -180,18 +237,24 @@ class ArbitrageFinder:
         # 2. Prepare Results Directory
         results_path = os.path.join(RESULTS_DIR, f"results_{self.current_timestamp}")
         os.makedirs(results_path, exist_ok=True)
-
-        # 3. Analyze Files
+        
+        # 3. Analyze Files concurrently
         json_files = glob.glob(os.path.join(data_dir, "*.json"))
-        # Filter out all_markets.json to avoid duplication if we process categories
         json_files = [f for f in json_files if "all_markets.json" not in f]
         
         print(f"Found {len(json_files)} category files to analyze.")
         
-        for f in json_files:
-            await self.analyze_file(f, results_path)
-            # Rate limit protection
-            await asyncio.sleep(1)
+        # Limit concurrency based on keys, but at least 5, max 50
+        num_keys = len(self.openai_keys.get_all_keys())
+        concurrency_limit = max(5, min(num_keys * 2, 50))
+        semaphore = asyncio.Semaphore(concurrency_limit)
+        
+        async def worker(filepath):
+            async with semaphore:
+                await self.analyze_file(filepath, results_path)
+
+        tasks = [worker(f) for f in json_files]
+        await asyncio.gather(*tasks)
 
         print("Arbitrage analysis complete.")
 
