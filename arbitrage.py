@@ -139,7 +139,7 @@ class ArbitrageFinder:
             key = self.gemini_keys.get_current_key()
             try:
                 genai.configure(api_key=key)
-                model = genai.GenerativeModel('gemini-1.5-pro') # Using 1.5 Pro as proxy for "3.0"
+                model = genai.GenerativeModel('gemini-3-pro-preview') # Using gemini-3-pro-preview
                 response = await model.generate_content_async(prompt)
                 return response.text
             except Exception as e:
@@ -159,7 +159,7 @@ class ArbitrageFinder:
             try:
                 client = OpenAI(api_key=key)
                 response = client.chat.completions.create(
-                    model="gpt-4o", # Using 4o as proxy for "5.1"
+                    model="gpt-5.1-codex", # Using gpt-5.1-codex
                     messages=[{"role": "user", "content": prompt}],
                     response_format={"type": "json_object"}
                 )

@@ -10,7 +10,7 @@ A comprehensive toolset to scrape Polymarket data and analyze it for arbitrage o
 -   **Smart Organization**: Categorizes markets by label (e.g., `Politics.json`, `Crypto.json`) in timestamped directories.
 
 ### Arbitrage Finder
--   **AI-Powered Analysis**: Uses Gemini 3.0 (via 1.5 Pro) or GPT-5.1 (via GPT-4o) to find opportunities.
+-   **AI-Powered Analysis**: Uses Gemini 3.0 (via gemini-3-pro-preview) or GPT-5.1 (via gpt-5.1-codex) to find opportunities.
 -   **Three Detection Modes**:
     -   **Real Arbitrage**: Mathematical profit opportunities.
     -   **Value Arbitrage**: Odds discrepancies vs real-world probability.
