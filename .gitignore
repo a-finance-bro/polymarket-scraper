@@ -12,3 +12,4 @@ working_keys.txt
 openai_keys.txt
 server.log
 .env
+*.pdf

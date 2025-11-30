@@ -122,10 +122,23 @@ function renderResults() {
     filtered.forEach(opp => {
         const card = document.createElement('div');
         card.className = 'opportunity-card';
+
+        const sourceClass = `source-${opp.source || 'LLM'}`;
+        const profitClass = `profit-${opp.profit_potential}`;
+
         card.innerHTML = `
-            <span class="profit-badge profit-${opp.profit_potential}">${opp.profit_potential} Profit</span>
+            <div class="opportunity-header">
+                <span class="opportunity-type">${opp.type}</span>
+                <div>
+                    <span class="source-badge ${sourceClass}">${opp.source || 'LLM'}</span>
+                    <span class="profit-badge ${profitClass}">${opp.profit_potential} Profit</span>
+                </div>
+            </div>
             <h3>${opp.market_title}</h3>
             <p>${opp.description}</p>
+            <div class="confidence-meter">
+                <div class="confidence-fill" style="width: ${opp.confidence * 100}%"></div>
+            </div>
             <small>Confidence: ${(opp.confidence * 100).toFixed(0)}%</small>
             <div style="margin-top: 10px;">
                 <button onclick="refreshOpportunity(this)" style="padding: 4px 8px; cursor: pointer;">Refresh</button>

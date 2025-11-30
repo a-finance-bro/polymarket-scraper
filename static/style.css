@@ -1,13 +1,15 @@
 :root {
     --primary-color: #007bff;
-    --bg-color: #f4f4f9;
-    --card-bg: #ffffff;
-    --text-color: #333;
+    --secondary-color: #6c757d;
     --success-color: #28a745;
+    --bg-color: #000000;
+    --text-color: #ffffff;
+    --card-bg: #1a1a1a;
+    --border-color: #333;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
@@ -19,18 +21,17 @@ body {
     margin: 0 auto;
 }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+h1,
+h2 {
+    color: var(--text-color);
 }
 
 .controls {
+    background-color: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
     display: flex;
     gap: 20px;
     align-items: center;
@@ -42,46 +43,43 @@ header {
     gap: 10px;
 }
 
-select {
-    padding: 8px;
+select,
+button {
+    padding: 8px 12px;
     border-radius: 4px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
+    background-color: #333;
+    color: white;
 }
 
-.primary-btn {
+button {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background 0.2s;
+    transition: background-color 0.2s;
 }
 
-.primary-btn:hover {
+button:hover {
     background-color: #0056b3;
 }
 
-.primary-btn:disabled {
-    background-color: #ccc;
+button:disabled {
+    background-color: #555;
     cursor: not-allowed;
 }
 
 #progress-container {
-    margin-bottom: 30px;
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    display: none;
 }
 
 .progress-bar {
-    height: 10px;
-    background-color: #e9ecef;
-    border-radius: 5px;
+    width: 100%;
+    height: 20px;
+    background-color: #333;
+    border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 10px;
 }
 
 .progress-fill {
@@ -91,58 +89,78 @@ select {
     transition: width 0.3s ease;
 }
 
-.tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+#status-text {
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: #aaa;
 }
 
-.tab-btn {
-    padding: 10px 20px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    font-weight: bold;
-    color: #666;
-}
-
-.tab-btn.active {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
-}
-
-.opportunities-grid {
+.results-section {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
 }
 
 .opportunity-card {
-    background: var(--card-bg);
-    padding: 20px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border-left: 4px solid var(--primary-color);
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
 }
 
-.opportunity-card h3 {
-    margin-top: 0;
-    font-size: 1.1em;
-}
-
-.profit-badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    font-weight: bold;
+.opportunity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 10px;
 }
 
-.profit-High { background-color: #d4edda; color: #155724; }
-.profit-Medium { background-color: #fff3cd; color: #856404; }
-.profit-Low { background-color: #d1ecf1; color: #0c5460; }
+.opportunity-type {
+    font-size: 0.8em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: #333;
+    color: #ddd;
+}
+
+.profit-badge {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.profit-High {
+    background-color: #1e4620;
+    color: #4caf50;
+}
+
+.profit-Medium {
+    background-color: #463c1e;
+    color: #ffc107;
+}
+
+.profit-Low {
+    background-color: #462020;
+    color: #f44336;
+}
+
+.source-badge {
+    font-size: 0.8em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 5px;
+}
+
+.source-Algorithm {
+    background-color: #004085;
+    color: #b8daff;
+}
+
+.source-LLM {
+    background-color: #383d41;
+    color: #e2e3e5;
+}
 
 .hidden {
     display: none;

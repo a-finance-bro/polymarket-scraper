@@ -126,6 +126,30 @@ class ArbitrageFinder:
             print(f"Error running scraper: {e}")
             return None
 
+    def find_algo_arbitrage(self, data):
+        opportunities = []
+        for market in data:
+            try:
+                # Check for Negative Risk (Sum of prices < 1)
+                # Assuming outcomePrices are strings like ["0.5", "0.6"]
+                if "outcomePrices" in market and market["outcomePrices"]:
+                    prices = [float(p) for p in json.loads(market["outcomePrices"])]
+                    total_price = sum(prices)
+                    
+                    if total_price < 1.0:
+                        profit = (1.0 - total_price) * 100
+                        opportunities.append({
+                            "market_title": market.get("title", "Unknown"),
+                            "type": "Real",
+                            "description": f"Algorithm detected Negative Risk: Sum of prices is {total_price:.4f} (< 1.0). Guaranteed profit of {profit:.2f}%.",
+                            "profit_potential": "High" if profit > 5 else "Medium",
+                            "confidence": 1.0,
+                            "source": "Algorithm"
+                        })
+            except Exception as e:
+                continue
+        return opportunities
+
     async def analyze_file(self, filepath, output_dir):
         filename = os.path.basename(filepath)
         category = filename.replace(".json", "")
@@ -135,6 +159,11 @@ class ArbitrageFinder:
         with open(filepath, "r") as f:
             data = json.load(f)
             
+        # 1. Run Algorithmic Check
+        algo_opportunities = self.find_algo_arbitrage(data)
+        print(f"Found {len(algo_opportunities)} algorithmic opportunities in {category}")
+
+        # 2. Run LLM Analysis
         # If data is huge, we might need to chunk it. 
         # For now, let's assume it fits in context or we take top markets.
         # To save tokens/time, let's limit to top 50 markets per file if it's huge.
@@ -142,11 +171,14 @@ class ArbitrageFinder:
             data = data[:50]
 
         prompt = f"""
-        Analyze the following Polymarket data for arbitrage opportunities.
-        Focus on:
-        1. Real Arbitrage: Sure profit opportunities (e.g. prices summing to < 1).
-        2. Value Arbitrage: Discrepancies between implied probability and real-world odds.
-        3. Logic Arbitrage: Inconsistencies between related markets.
+        Analyze the following Polymarket data for arbitrage opportunities, relying on ASK PRICES.
+        
+        Strategies to look for:
+        1. **Real Arbitrage (Negative Risk)**: Sum of outcome prices < 1.0.
+        2. **Cross-Market Arbitrage**: Correlations between different markets. 
+           - Example: "Will Trump win PA?" vs "Will Trump win Election?". If PA is key, their prices should be aligned.
+           - Look for "Balanced" trades where you hedge a specific outcome with a basket of related outcomes (Jeremy Whittaker strategy).
+        3. **Value Arbitrage**: Discrepancies between implied probability and real-world odds.
 
         Data: {json.dumps(data)}
 
@@ -158,7 +190,8 @@ class ArbitrageFinder:
                     "type": "Real" | "Value" | "Logic",
                     "description": "...",
                     "profit_potential": "High" | "Medium" | "Low",
-                    "confidence": 0.0-1.0
+                    "confidence": 0.0-1.0,
+                    "source": "LLM"
                 }}
             ]
         }}
@@ -166,21 +199,30 @@ class ArbitrageFinder:
 
         response_text = await self._call_llm(prompt)
         
+        llm_opportunities = []
         if response_text:
             try:
                 # Clean response (remove markdown code blocks)
                 response_text = response_text.replace("```json", "").replace("```", "").strip()
                 result_json = json.loads(response_text)
-                
-                output_path = os.path.join(output_dir, filename)
-                with open(output_path, "w") as f:
-                    json.dump(result_json, f, indent=2)
-                print(f"Saved results for {category}")
+                llm_opportunities = result_json.get("opportunities", [])
+                # Ensure source is set
+                for opp in llm_opportunities:
+                    opp["source"] = "LLM"
             except Exception as e:
                 print(f"Error parsing LLM response for {category}: {e}")
                 # Save raw response for debugging
                 with open(os.path.join(output_dir, f"{category}_error.txt"), "w") as f:
                     f.write(response_text)
+        
+        # Merge results
+        all_opportunities = algo_opportunities + llm_opportunities
+        
+        if all_opportunities:
+            output_path = os.path.join(output_dir, filename)
+            with open(output_path, "w") as f:
+                json.dump({"opportunities": all_opportunities}, f, indent=2)
+            print(f"Saved {len(all_opportunities)} results for {category}")
 
     async def _call_llm(self, prompt):
         return await self._call_openai(prompt)

@@ -10,11 +10,18 @@ A comprehensive toolset to scrape Polymarket data and analyze it for arbitrage o
 -   **Smart Organization**: Categorizes markets by label (e.g., `Politics.json`, `Crypto.json`) in timestamped directories.
 
 ### Arbitrage Finder
--   **AI-Powered Analysis**: Uses GPT-4o to find opportunities.
+-   **Hybrid Detection System**:
+    -   **Algorithmic Engine**: Deterministically checks for Negative Risk (Sum of Ask Prices < 1.0) and other mathematical arbitrages (inspired by Jeremy Whittaker's strategy).
+    -   **AI-Powered Analysis**: Uses **GPT-4o** (with GPT-4.1 fallback) to find complex Cross-Market and Value arbitrages.
 -   **Three Detection Modes**:
-    -   **Real Arbitrage**: Mathematical profit opportunities.
-    -   **Value Arbitrage**: Odds discrepancies vs real-world probability.
-    -   **Logic Arbitrage**: Inconsistencies between correlated markets.
+    -   **Real Arbitrage**: Sure profit opportunities (Algo & LLM).
+    -   **Cross-Market Arbitrage**: Hedging across correlated markets (e.g. State vs National).
+    -   **Value Arbitrage**: Mispricing vs reality.
+-   **Dark Mode UI**: Sleek, high-contrast interface for long monitoring sessions.
+-   **Scalable Architecture**:
+    -   **Key Rotation & Validation**: Automatically manages and validates OpenAI keys.
+    -   **Concurrency**: Processes up to 50 market categories in parallel.
+    -   **Resilience**: Handles context limits and API errors gracefully.
 -   **Web Interface**: Clean UI to run jobs, track progress, and view results.
 
 ## Installation
