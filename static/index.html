@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polymarket Arbitrage Finder</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Polymarket Arbitrage Finder</h1>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="model-select">Model:</label>
+                    <select id="model-select">
+                        <option value="gemini">Gemini 3.0 (1.5 Pro)</option>
+                        <option value="openai">GPT-5.1 (GPT-4o)</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="history-select">Past Results:</label>
+                    <select id="history-select">
+                        <option value="">Select a run...</option>
+                    </select>
+                </div>
+                <button id="run-btn" class="primary-btn">Run Arbitrage Finder</button>
+            </div>
+        </header>
+
+        <div id="progress-container" class="hidden">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <p id="status-text">Initializing...</p>
+        </div>
+
+        <main id="results-container" class="hidden">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="Real">Real Arbitrage</button>
+                <button class="tab-btn" data-tab="Value">Value Arbitrage</button>
+                <button class="tab-btn" data-tab="Logic">Logic Arbitrage</button>
+            </div>
+
+            <div id="opportunities-list" class="opportunities-grid">
+                <!-- Opportunities will be injected here -->
+            </div>
+        </main>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>

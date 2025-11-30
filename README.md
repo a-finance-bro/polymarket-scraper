@@ -1,16 +1,21 @@
-# Polymarket Data Scraper
+# Polymarket Data Scraper & Arbitrage Finder
 
-A high-performance, asynchronous Python script to scrape **every single market** from Polymarket.com. It fetches raw data directly from the Polymarket Gamma API, bypassing the need for slow browser automation.
+A comprehensive toolset to scrape Polymarket data and analyze it for arbitrage opportunities using LLMs (Gemini/OpenAI).
 
 ## Features
 
--   **Complete Coverage**: Fetches all available markets (thousands) in seconds.
+### Data Scraper
+-   **Complete Coverage**: Fetches all available markets (thousands) in seconds via the Gamma API.
 -   **Structured Data**: Saves detailed market data including titles, descriptions, rules, contracts, pricing, and liquidity.
--   **Smart Organization**:
-    -   Creates a **timestamped directory** for each run (e.g., `data/2023-10-27_10-00-00/`).
-    -   **Categorizes markets** by label (e.g., `Politics.json`, `Crypto.json`, `Sports.json`).
-    -   Saves a master `all_markets.json` file with the complete dataset.
--   **Efficiency**: Uses `aiohttp` for asynchronous API requests and `tqdm` for progress tracking.
+-   **Smart Organization**: Categorizes markets by label (e.g., `Politics.json`, `Crypto.json`) in timestamped directories.
+
+### Arbitrage Finder
+-   **AI-Powered Analysis**: Uses Gemini 3.0 (via 1.5 Pro) or GPT-5.1 (via GPT-4o) to find opportunities.
+-   **Three Detection Modes**:
+    -   **Real Arbitrage**: Mathematical profit opportunities.
+    -   **Value Arbitrage**: Odds discrepancies vs real-world probability.
+    -   **Logic Arbitrage**: Inconsistencies between correlated markets.
+-   **Web Interface**: Clean UI to run jobs, track progress, and view results.
 
 ## Installation
 
@@ -20,58 +25,48 @@ A high-performance, asynchronous Python script to scrape **every single market**
     cd polymarket-scraper
     ```
 
-2.  Install the required dependencies:
+2.  Install dependencies:
     ```bash
     pip install -r requirements.txt
     ```
 
+3.  **Setup Keys**:
+    -   Create `gemini_keys.txt` and paste your Google AI Studio keys (one per line).
+    -   Create `openai_keys.txt` and paste your OpenAI API keys (one per line).
+
 ## Usage
 
-Run the scraper using Python:
+### 1. Web Interface (Recommended)
 
+Start the backend server:
+```bash
+python3 server.py
+```
+
+Then open **http://localhost:8000** in your browser.
+-   Select your preferred model.
+-   Click **"Run Arbitrage Finder"**.
+-   Watch the progress bar as it scrapes and analyzes markets.
+-   View categorized opportunities in the results tabs.
+
+### 2. Manual Scraper
+
+To just fetch data without analysis:
 ```bash
 python3 scraper.py
 ```
 
-### Options
-
--   **Limit the number of markets** (useful for testing):
-    ```bash
-    python3 scraper.py --limit 1000
-    ```
-
 ## Output Structure
-
-The script creates a `data/` directory. Inside, you will find a folder for each run, named with the current timestamp.
 
 ```
 data/
-└── YYYY-MM-DD_HH-MM-SS/
-    ├── all_markets.json       # Complete dataset containing all markets
-    ├── Politics.json          # Markets labeled "Politics"
-    ├── Crypto.json            # Markets labeled "Crypto"
-    ├── Sports.json            # Markets labeled "Sports"
-    └── ...                    # Other categories
-```
+└── YYYY-MM-DD_HH-MM-SS/    # Raw scraped data
+    ├── all_markets.json
+    ├── Politics.json
+    └── ...
 
-## Data Format
-
-Each market object in the JSON files contains detailed information:
-
-```json
-{
-  "title": "Ethereum Up or Down...",
-  "description": "This market will resolve to...",
-  "tags": [{"label": "Crypto"}, ...],
-  "markets": [
-    {
-      "question": "Ethereum Up or Down...",
-      "outcomes": "[\"Up\", \"Down\"]",
-      "outcomePrices": "[\"0.5\", \"0.5\"]",
-      "liquidity": "74333.9434"
-    }
-  ],
-  "startDate": "...",
-  "endDate": "..."
-}
+results/
+└── results_YYYY-MM-DD_HH-MM-SS/  # AI Analysis results
+    ├── Politics.json
+    └── ...
 ```

@@ -1,9 +1,13 @@
 data/
 screenshots/
 output/
+results/
 __pycache__/
 *.pyc
 .DS_Store
 .venv/
 env/
 venv/
+gemini_keys.txt
+openai_keys.txt
+server.log
