@@ -108,7 +108,10 @@ async function loadResults(timestamp) {
 function renderResults() {
     opportunitiesList.innerHTML = '';
 
-    const filtered = currentResults.filter(opp => opp.type === activeTab);
+    const filtered = currentResults.filter(opp => {
+        if (opp.validation_status !== 1) return false; // Only show validated
+        return opp.type === activeTab;
+    });
 
     if (filtered.length === 0) {
         opportunitiesList.innerHTML = '<p>No opportunities found for this category.</p>';

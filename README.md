@@ -34,6 +34,10 @@ A comprehensive toolset to scrape Polymarket data and analyze it for arbitrage o
     -   **Concurrency**: Processes up to 50 market categories in parallel.
     -   **Resilience**: Handles context limits and API errors gracefully.
 -   **Web Interface**: Clean UI to run jobs, track progress, and view results.
+-   **Validation Loop**:
+    -   **Fresh Data Fetch**: Instantly fetches live API data for every potential arbitrage.
+    -   **LLM Verification**: Uses GPT-4o to verify if the arbitrage still exists and is profitable in real-time.
+    -   **Strict Filtering**: Only displays opportunities that pass this rigorous double-check (Status 1).
 
 ## Installation
 
