@@ -8,6 +8,7 @@ __pycache__/
 .venv/
 env/
 venv/
-gemini_keys.txt
+
 openai_keys.txt
 server.log
+.env

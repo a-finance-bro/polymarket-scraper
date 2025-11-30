@@ -76,7 +76,7 @@ async def read_root():
     return FileResponse('static/index.html')
 
 @app.post("/api/run")
-async def run_arbitrage(background_tasks: BackgroundTasks, model: str = "gemini"):
+async def run_arbitrage(background_tasks: BackgroundTasks, model: str = "openai"):
     if job_status.is_running:
         raise HTTPException(status_code=400, detail="Job already running")
     

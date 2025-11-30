@@ -3,7 +3,7 @@ import json
 import asyncio
 import argparse
 from datetime import datetime
-import google.generativeai as genai
+
 from openai import OpenAI
 import subprocess
 import glob
@@ -11,7 +11,7 @@ import time
 import random
 
 # Configuration
-GEMINI_KEYS_FILE = "gemini_keys.txt"
+
 OPENAI_KEYS_FILE = "openai_keys.txt"
 DATA_DIR = "data"
 RESULTS_DIR = "results"
@@ -48,7 +48,7 @@ class KeyManager:
 class ArbitrageFinder:
     def __init__(self, model_provider="gemini"):
         self.model_provider = model_provider
-        self.gemini_keys = KeyManager(GEMINI_KEYS_FILE)
+
         self.openai_keys = KeyManager(OPENAI_KEYS_FILE)
         self.current_timestamp = None
 
@@ -125,31 +125,9 @@ class ArbitrageFinder:
                     f.write(response_text)
 
     async def _call_llm(self, prompt):
-        if self.model_provider == "gemini":
-            return await self._call_gemini(prompt)
-        elif self.model_provider == "openai":
-            return await self._call_openai(prompt)
-        return None
+        return await self._call_openai(prompt)
 
-    async def _call_gemini(self, prompt):
-        keys = self.gemini_keys.get_all_keys()
-        start_index = self.gemini_keys.current_index
-        
-        for _ in range(len(keys)):
-            key = self.gemini_keys.get_current_key()
-            try:
-                genai.configure(api_key=key)
-                model = genai.GenerativeModel('gemini-3-pro-preview') # Using gemini-3-pro-preview
-                response = await model.generate_content_async(prompt)
-                return response.text
-            except Exception as e:
-                print(f"Gemini error with key ...{key[-4:]}: {e}")
-                self.gemini_keys.rotate_key()
-                # Simple backoff
-                await asyncio.sleep(1)
-        
-        print("All Gemini keys failed.")
-        return None
+
 
     async def _call_openai(self, prompt):
         keys = self.openai_keys.get_all_keys()
@@ -198,7 +176,7 @@ class ArbitrageFinder:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model", choices=["gemini", "openai"], default="gemini")
+    parser.add_argument("--model", choices=["openai"], default="openai")
     args = parser.parse_args()
 
     finder = ArbitrageFinder(model_provider=args.model)
