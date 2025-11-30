@@ -34,7 +34,22 @@ async def run_arbitrage_task(model_provider: str):
         # Step 1: Scrape
         job_status.current_step = "Scraping Markets..."
         job_status.progress = 10
-        data_dir = await asyncio.to_thread(finder.run_scraper)
+        
+        def update_progress(msg):
+            job_status.current_step = msg
+            # Try to parse tqdm percentage if available (e.g. "50%|...")
+            if "%" in msg:
+                try:
+                    # Simple heuristic: extract first number before %
+                    parts = msg.split('%')
+                    if parts[0].strip().isdigit():
+                        # Map 0-100 scraper progress to 10-30 overall progress
+                        scraper_pct = int(parts[0].strip())
+                        job_status.progress = 10 + int(scraper_pct * 0.2)
+                except:
+                    pass
+
+        data_dir = await asyncio.to_thread(finder.run_scraper, status_callback=update_progress)
         
         if not data_dir:
             job_status.current_step = "Scraping Failed"

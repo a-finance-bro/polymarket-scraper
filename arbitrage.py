@@ -52,14 +52,35 @@ class ArbitrageFinder:
         self.openai_keys = KeyManager(OPENAI_KEYS_FILE)
         self.current_timestamp = None
 
-    def run_scraper(self):
+    def run_scraper(self, status_callback=None):
         print("Running scraper...")
         try:
-            # Run scraper.py using subprocess
-            subprocess.run(["python3", "scraper.py"], check=True)
+            # Run scraper.py using subprocess with Popen to capture output
+            process = subprocess.Popen(
+                ["python3", "scraper.py"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                bufsize=1
+            )
+
+            # Read output line by line
+            for line in process.stdout:
+                line = line.strip()
+                if line:
+                    print(line)
+                    if status_callback:
+                        status_callback(line)
+
+            process.wait()
+            if process.returncode != 0:
+                raise Exception(f"Scraper failed with exit code {process.returncode}")
             
             # Find the latest data folder
             list_of_dirs = glob.glob(os.path.join(DATA_DIR, "*"))
+            if not list_of_dirs:
+                raise Exception("No data directories found after scraping")
+                
             latest_dir = max(list_of_dirs, key=os.path.getctime)
             self.current_timestamp = os.path.basename(latest_dir)
             print(f"Scraper finished. Data saved to {latest_dir}")
