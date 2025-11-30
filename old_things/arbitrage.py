@@ -510,8 +510,14 @@ class ArbitrageFinder:
         validated_opportunities = []
         if all_opportunities:
             print(f"Validating {len(all_opportunities)} opportunities in {category}...")
-            # Run validation concurrently
-            validation_tasks = [self.validate_opportunity(opp) for opp in all_opportunities]
+            # Run validation concurrently with limit
+            validation_semaphore = asyncio.Semaphore(50)
+            
+            async def validate_worker(opp):
+                async with validation_semaphore:
+                    return await self.validate_opportunity(opp)
+
+            validation_tasks = [validate_worker(opp) for opp in all_opportunities]
             results = await asyncio.gather(*validation_tasks)
             
             # Filter only validated ones (status == 1)
@@ -588,9 +594,8 @@ class ArbitrageFinder:
         
         print(f"Found {len(json_files)} category files to analyze.")
         
-        # Aggressive concurrency: 100 concurrent tasks if we have enough keys
-        num_keys = len(self.openai_keys.get_all_keys())
-        concurrency_limit = max(10, num_keys * 5) # 5 requests per key?
+        # Aggressive concurrency: 50 categories at a time
+        concurrency_limit = 50
         semaphore = asyncio.Semaphore(concurrency_limit)
         
         async def worker(filepath):

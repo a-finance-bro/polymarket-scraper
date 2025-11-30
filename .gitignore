@@ -13,3 +13,8 @@ openai_keys.txt
 server.log
 .env
 *.pdf
+mistral_key.txt
+domeapi.txt
+*.key
+*.pem
+temp/

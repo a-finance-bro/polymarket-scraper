@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontrunner Oracle</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #111;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #222;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        input {
+            padding: 10px;
+            width: 70%;
+            background: #333;
+            border: none;
+            color: #fff;
+        }
+
+        button {
+            padding: 10px;
+            background: #007bff;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .watchlist-item {
+            border-left: 4px solid #007bff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Frontrunner Oracle</h1>
+
+        <div class="card">
+            <h3>Search Markets</h3>
+            <input type="text" id="search" placeholder="Search Polymarket...">
+            <button onclick="search()">Search</button>
+            <div id="results"></div>
+        </div>
+
+        <div class="card">
+            <h3>Watchlist</h3>
+            <div id="watchlist"></div>
+        </div>
+    </div>
+
+    <script>
+        async function search() {
+            const q = document.getElementById('search').value;
+            const res = await fetch(`/api/search?q=${q}`);
+            const data = await res.json();
+            const div = document.getElementById('results');
+            div.innerHTML = data.map(m => `
+                <div class="card">
+                    ${m.title} 
+                    <button onclick='addToWatchlist(${JSON.stringify(m)})'>+</button>
+                </div>
+            `).join('');
+        }
+
+        async function addToWatchlist(market) {
+            await fetch('/api/watchlist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ market })
+            });
+            loadWatchlist();
+        }
+
+        async function loadWatchlist() {
+            const res = await fetch('/api/watchlist');
+            const data = await res.json();
+            const div = document.getElementById('watchlist');
+            div.innerHTML = data.map(m => `
+                <div class="card watchlist-item">
+                    <h4>${m.title}</h4>
+                    <input type="text" placeholder="Paste Results Page URL" id="url-${m.id}">
+                    <button onclick="startPolling('${m.id}')">Start Polling</button>
+                    <div id="status-${m.id}">Status: Idle</div>
+                </div>
+            `).join('');
+        }
+
+        loadWatchlist();
+    </script>
+</body>
+
+</html>

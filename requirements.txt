@@ -1,7 +1,6 @@
+nautilus_trader
+requests
+pandas
+numpy
 aiohttp
-tqdm
-fastapi
-uvicorn
-google-generativeai
-openai
-python-multipart
+python-dotenv
