@@ -31,7 +31,12 @@ fi
 echo "\n[4] Checking System Time..."
 current_date=$(date)
 echo "   Current Time: $current_date"
-echo "   (If this is wrong, SSL/HTTPS will fail)"
+
+echo "\n[5] Network Configuration (Debug Info)..."
+echo "--- Routes ---"
+ip route
+echo "\n--- Interfaces ---"
+ip addr
 
 echo "\n========================================"
 echo "Diagnostic Complete."
