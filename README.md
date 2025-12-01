@@ -29,6 +29,12 @@ A high-speed monitoring script designed to snipe the "Global Temperature Increas
 -   **Notification**: Audio alerts (`mlg-airhorn.mp3`) and system notifications upon detection.
 -   **Note**: Currently configured for a single contract (November 2025). Future updates will expand this to a "Container" model on the Sniper Page, allowing multiple contracts to be monitored simultaneously.
 
+### 5. NASA Sniper - Raspberry Pi Edition (`nasa_sniper_raspi/`)
+A robust, 24/7 version of the NASA Sniper optimized for Raspberry Pi.
+-   **Continuous Operation**: Designed to run non-stop with robust error handling.
+-   **Status Reporting**: Prints status updates every 5 seconds to the connected monitor.
+-   **Setup**: Includes a dedicated `README.md` with SSH and installation instructions.
+
 ## Usage
 
 ### Simulation (Verify Logic)
