@@ -10,18 +10,26 @@ sudo systemctl stop openvpn 2>/dev/null
 sudo systemctl stop tailscaled 2>/dev/null
 echo "Services stopped."
 
-echo "\n[2] Flushing Firewall/IPTables Rules..."
-# This removes "Killswitch" rules that block internet when VPN is off
-sudo iptables -F
-sudo iptables -X
-sudo iptables -t nat -F
-sudo iptables -t nat -X
-sudo iptables -P INPUT ACCEPT
-sudo iptables -P FORWARD ACCEPT
-sudo iptables -P OUTPUT ACCEPT
-echo "Firewall rules flushed."
+echo "\n[2] Flushing Firewall Rules..."
+# Try UFW (Uncomplicated Firewall)
+sudo ufw disable 2>/dev/null
+echo "UFW disabled (if present)."
+
+# Try NFTables (Modern replacement for iptables)
+sudo nft flush ruleset 2>/dev/null
+echo "NFTables flushed (if present)."
+
+# Try IPTables (Legacy)
+sudo iptables -F 2>/dev/null
+sudo iptables -X 2>/dev/null
+sudo iptables -t nat -F 2>/dev/null
+sudo iptables -t nat -X 2>/dev/null
 
 echo "\n[3] Testing Connection..."
+echo "--- Pinging Gateway (192.168.68.1) ---"
+ping -c 3 192.168.68.1
+
+echo "\n--- Pinging Google (8.8.8.8) ---"
 ping -c 3 8.8.8.8
 
 echo "\n========================================"
