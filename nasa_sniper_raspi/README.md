@@ -94,6 +94,20 @@ sudo sh -c 'echo "nameserver 8.8.8.8" > /etc/resolv.conf'
 pip3 install requests python-dotenv py-clob-client
 ```
 
+### VPN / Firewall Issues ("No Route to Host", "Ping Fails")
+If you previously used a VPN (Proton, WireGuard, etc.), it might have left a "Killswitch" active.
+
+**Run the VPN Fix Script:**
+1.  Transfer the script:
+    ```bash
+    scp nasa_sniper_raspi/fix_vpn.sh jjcam@<YOUR_PI_IP>:~/nasa_sniper_raspi/
+    ```
+2.  Run it on Pi:
+    ```bash
+    ./fix_vpn.sh
+    ```
+3.  **Reboot immediately**.
+
 3.  **Fix System Time** (SSL fails if time is wrong):
     ```bash
     sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z"
@@ -120,3 +134,5 @@ python3 sniper_pi.py
 # Detach with Ctrl+B, then D
 # Reattach with: tmux attach -t sniper
 ```
+
+
