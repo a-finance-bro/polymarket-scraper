@@ -18,3 +18,4 @@ domeapi.txt
 *.key
 *.pem
 temp/
+trade_sample.py

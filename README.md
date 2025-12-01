@@ -22,6 +22,13 @@ A "human-in-the-loop" Oracle system designed to predict market resolutions befor
 -   **Context Agent**: Automates browser interactions to screenshot market rules and uses GPT-4o to generate optimized prompts for Mistral.
 -   **Resolution Loop**: Continuously polls a user-provided "Results Page" URL and queries Mistral AI to determine if the market has resolved, providing a confidence score and direction.
 
+### 4. NASA Temp Sniper (`strategies/nasa_sniper/`)
+A high-speed monitoring script designed to snipe the "Global Temperature Increase" market.
+-   **Monitoring**: Concurrently monitors NASA GISTEMP data using fast regex and robust parsing methods.
+-   **Execution**: Automatically places a buy order via `py_clob_client` the instant the November 2025 data is released.
+-   **Notification**: Audio alerts (`mlg-airhorn.mp3`) and system notifications upon detection.
+-   **Note**: Currently configured for a single contract (November 2025). Future updates will expand this to a "Container" model on the Sniper Page, allowing multiple contracts to be monitored simultaneously.
+
 ## Usage
 
 ### Simulation (Verify Logic)
@@ -34,6 +41,11 @@ python3 simulation.py
 python3 strategies/frontrunner/app.py
 ```
 Then open `http://localhost:5001`.
+
+### NASA Sniper
+```bash
+python3 strategies/nasa_sniper/sniper.py
+```
 
 ### Backtesting (Nautilus Trader)
 Requires Python 3.10/3.11 environment.
