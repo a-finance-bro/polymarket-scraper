@@ -23,20 +23,26 @@ scp -r nasa_sniper_raspi pi@<YOUR_PI_IP>:~/nasa_sniper
 *Or just git clone the repo if you have git set up.*
 
 ### 3. Install Dependencies (On Pi)
-Update apt and install Python 3 & pip:
-```bash
-sudo apt update
-sudo apt install python3 python3-pip -y
-```
+**Important**: Modern Raspberry Pi OS requires a virtual environment to install Python packages.
 
-Install required Python libraries:
-```bash
-pip3 install requests python-dotenv py-clob-client
-```
-*Note: If `py-clob-client` fails to build, you might need build tools:*
-```bash
-sudo apt install build-essential libgmp-dev python3-dev -y
-```
+1.  Create a virtual environment:
+    ```bash
+    python3 -m venv venv
+    ```
+
+2.  Activate it:
+    ```bash
+    source venv/bin/activate
+    ```
+
+3.  Install required libraries:
+    ```bash
+    pip3 install requests python-dotenv py-clob-client
+    ```
+    *Note: If `py-clob-client` fails to build, you might need build tools:*
+    ```bash
+    sudo apt install build-essential libgmp-dev python3-dev -y
+    ```
 
 ### 4. Configuration
 1.  **Generate Token Map**:
@@ -59,7 +65,7 @@ sudo apt install build-essential libgmp-dev python3-dev -y
 
 ## Running the Sniper 🚀
 
-To run it non-stop and see the status on your monitor:
+To run it non-stop, ensure your virtual environment is activated (`source venv/bin/activate`) and run:
 
 ```bash
 python3 sniper_pi.py
