@@ -73,24 +73,26 @@ scp -r nasa_sniper_raspi pi@<YOUR_PI_IP>:~/nasa_sniper
 ## Troubleshooting
 
 ### Network / Pip Errors ("Connection Broken", "Temporary Failure")
-If `pip install` fails with connection errors, your Pi might have DNS or Time Sync issues.
+This is a **DNS Resolution Error**. Your Pi cannot translate "pypi.org" to an IP address.
 
-1.  **Check Internet**:
-    ```bash
-    ping -c 4 google.com
-    ```
-    If this fails, you have no internet.
+**Step 1: Check if you have Internet**
+Ping Google's IP directly (bypasses DNS):
+```bash
+ping -c 4 8.8.8.8
+```
+*   If this **fails** (100% packet loss), your Pi is **offline**. Check your WiFi/Ethernet cable.
+*   If this **works**, you have internet but **bad DNS**. Proceed to Step 2.
 
-2.  **Fix DNS**:
-    Edit `resolv.conf`:
-    ```bash
-    sudo nano /etc/resolv.conf
-    ```
-    Add this line:
-    ```
-    nameserver 8.8.8.8
-    ```
-    Save and try `pip install` again.
+**Step 2: Force Google DNS**
+Overwrite your DNS settings temporarily to force it to work:
+```bash
+sudo sh -c 'echo "nameserver 8.8.8.8" > /etc/resolv.conf'
+```
+
+**Step 3: Retry Install**
+```bash
+pip3 install requests python-dotenv py-clob-client
+```
 
 3.  **Fix System Time** (SSL fails if time is wrong):
     ```bash
