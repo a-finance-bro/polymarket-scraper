@@ -25,35 +25,42 @@ scp -r nasa_sniper_raspi pi@<YOUR_PI_IP>:~/nasa_sniper
 ### 3. Install Dependencies (On Pi)
 **Important**: Modern Raspberry Pi OS requires a virtual environment to install Python packages.
 
-1.  Create a virtual environment:
+1.  **Remove old version (if exists)**:
     ```bash
-    python3 -m venv venv
+    rm -rf nasa_sniper_raspi
     ```
 
-2.  Activate it:
+2.  **Transfer new code (From your Computer)**:
     ```bash
+    scp -r nasa_sniper_raspi jjcam@<YOUR_PI_IP>:~/
+    ```
+
+3.  **SSH into Pi**:
+    ```bash
+    ssh jjcam@<YOUR_PI_IP>
+    cd nasa_sniper_raspi
+    ```
+
+4.  **Create & Activate Virtual Environment**:
+    ```bash
+    python3 -m venv venv
     source venv/bin/activate
     ```
 
-3.  Install required libraries:
+5.  **Install Dependencies**:
     ```bash
     pip3 install requests python-dotenv py-clob-client
-    ```
-    *Note: If `py-clob-client` fails to build, you might need build tools:*
-    ```bash
-    sudo apt install build-essential libgmp-dev python3-dev -y
     ```
 
 ### 4. Configuration
 1.  **Generate Token Map**:
-    Run the fetch script to get the latest Token IDs.
     ```bash
     python3 fetch_tokens.py
     ```
     *Ensure `token_map.json` is created.*
 
 2.  **Set Private Key**:
-    Create a `.env` file in the folder:
+    Create a `.env` file:
     ```bash
     nano .env
     ```

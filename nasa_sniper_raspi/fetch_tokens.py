@@ -47,9 +47,9 @@ def fetch_tokens():
             mapping[title] = yes_id
             print(f"Mapped '{title}' -> {yes_id}")
             
-    with open("strategies/nasa_sniper/token_map.json", "w") as f:
+    with open("token_map.json", "w") as f:
         json.dump(mapping, f, indent=2)
-    print("Saved mapping to strategies/nasa_sniper/token_map.json")
+    print("Saved mapping to token_map.json")
 
 if __name__ == "__main__":
     fetch_tokens()
