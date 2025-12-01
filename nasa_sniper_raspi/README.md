@@ -70,12 +70,37 @@ scp -r nasa_sniper_raspi pi@<YOUR_PI_IP>:~/nasa_sniper
     ```
     Save (Ctrl+O, Enter) and Exit (Ctrl+X).
 
-## Running the Sniper 🚀
+## Troubleshooting
 
-To run it non-stop, ensure your virtual environment is activated (`source venv/bin/activate`) and run:
+### Network / Pip Errors ("Connection Broken", "Temporary Failure")
+If `pip install` fails with connection errors, your Pi might have DNS or Time Sync issues.
 
+1.  **Check Internet**:
+    ```bash
+    ping -c 4 google.com
+    ```
+    If this fails, you have no internet.
+
+2.  **Fix DNS**:
+    Edit `resolv.conf`:
+    ```bash
+    sudo nano /etc/resolv.conf
+    ```
+    Add this line:
+    ```
+    nameserver 8.8.8.8
+    ```
+    Save and try `pip install` again.
+
+3.  **Fix System Time** (SSL fails if time is wrong):
+    ```bash
+    sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z"
+    ```
+
+### "Externally Managed Environment"
+Ensure you are using the virtual environment:
 ```bash
-python3 sniper_pi.py
+source venv/bin/activate
 ```
 
 ### Features
